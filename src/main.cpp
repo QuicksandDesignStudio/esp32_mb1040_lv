@@ -30,7 +30,7 @@ void sensingTask(void *param)
   for(int i=0; i<Sensing::NUMBER_OF_SENSORS; i++)
   {
     String name = String(i);
-    sensors[i] = ProximitySensor(name, "mb1040_lv", Sensing::SENSORPINS[i]);
+    sensors[i] = ProximitySensor(name, Sensing::SENSOR_TYPE, Sensing::SENSORPINS[i]);
     sensorStates[i] = false;
   }
 

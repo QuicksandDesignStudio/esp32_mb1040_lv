@@ -29,6 +29,7 @@ namespace Sensing
     constexpr const int8_t  NUMBER_OF_SENSORS{1};
     constexpr const int8_t  SENSORPINS[NUMBER_OF_SENSORS]{27};
     constexpr const int16_t SENSE_DELAY_IN_MILLISECONDS{500};
+    String                  SENSOR_TYPE{"mb1040_lv"};
 }
 
 #endif

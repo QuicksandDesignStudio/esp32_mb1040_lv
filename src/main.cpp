@@ -9,8 +9,8 @@
 #define sensorPin 27
 
 bool          networkTrackerActive{true};
-bool          demoMode{false};    // Send socket message on and off every 5 seconds
-bool          demoState{true};   // On or Off
+bool          demoMode{false};            // Send socket message on and off every 5 seconds
+bool          demoState{true};            // On or Off
 
 WebClient     client{};
 

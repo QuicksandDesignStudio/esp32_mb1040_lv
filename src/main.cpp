@@ -27,7 +27,7 @@ std::array<bool, Sensing::NUMBER_OF_SENSORS> sensorStates;
 void sensingTask(void *param) 
 {
   //setup the array of sensors
-  for(int i=0; i<Sensing::NUMBER_OF_SENSORS; i++)
+  for(std::size_t i=0; i<Sensing::NUMBER_OF_SENSORS; i++)
   {
     String name = String(i);
     sensors[i] = ProximitySensor(name, Sensing::SENSOR_TYPE, Sensing::SENSORPINS[i]);
@@ -36,7 +36,7 @@ void sensingTask(void *param)
 
   while (true) {
 
-    for(int i=0; i<Sensing::NUMBER_OF_SENSORS; i++)
+    for(std::size_t i=0; i<Sensing::NUMBER_OF_SENSORS; i++)
     {
       sensors[i].sense();
       

@@ -4,7 +4,6 @@
 
 #include "Globals.hpp"
 #include "WebClient.hpp"
-#include "Tracker.hpp"
 #include "ProximitySensor.hpp"
 
 #define sensorPin 27

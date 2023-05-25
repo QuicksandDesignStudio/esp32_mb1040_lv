@@ -4,7 +4,6 @@
 #include "Globals.hpp"
 #include <Arduino.h>
 #include <ESPmDNS.h>
-#include <HTTPClient.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
 

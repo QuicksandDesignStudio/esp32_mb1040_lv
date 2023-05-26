@@ -60,23 +60,26 @@ void sensingTask(void *param)
       Serial.println("No Change");
       continue;
     }
-    
+
+    /* ------------------SEND MESSAGE------------- */
     String message = "";
-    // Send message
+    // Create Message
     for (std::size_t i=0; i< Sensing::NUMBER_OF_SENSORS; i++)
     { 
       String sensorState = currentSensorStates[i] ? Network::ON : Network::OFF;
       message = message + sensorState + ":";
     }
 
+    //Remove the last colon
     message.remove(message.length() - 1);
 
-    //send message
+    //Send message
     Serial.println("Sending Message : " + message);
     bool success = client.sendMessage(message, Network::RASPBERRY_PI_SERVER_IP, Network::PORT, Network::MAX_TRIES);
     if(!success) {
       Serial.println("Failed to send message");
     }
+    /* ------------------------------------------- */
   }
 }
 

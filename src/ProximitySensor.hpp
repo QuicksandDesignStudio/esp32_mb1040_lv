@@ -7,13 +7,6 @@
 class ProximitySensor {
 
 private:
-    // Black box function from Mr. Dave Plumber himself returns time of day
-    static double Time()
-    {
-        timeval tv = {0};
-        gettimeofday(&tv, nullptr);
-        return (double)(tv.tv_usec / 1000000.0 + (double) tv.tv_sec);
-    }
 
     String          m_sensorName;
     String          m_sensorType;

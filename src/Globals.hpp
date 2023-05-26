@@ -25,6 +25,11 @@ namespace Sensing
     constexpr const int8_t  SENSORPINS[NUMBER_OF_SENSORS]{12,13,14,25,26,27};
     constexpr const int16_t SENSE_DELAY_IN_MILLISECONDS{500};
     String                  SENSOR_TYPE{"mb1040_lv"};
+    struct SensorResponse
+    {
+        long sensorValue;
+        bool isTriggered;
+    };
 }
 
 // Black box function from Mr. Dave Plumber himself returns time of day

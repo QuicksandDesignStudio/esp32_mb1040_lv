@@ -13,9 +13,6 @@ TaskHandle_t  networkTaskHandle;
 
 // Array of sensors
 ProximitySensor sensors[Sensing::NUMBER_OF_SENSORS];
-bool sensorStates[Sensing::NUMBER_OF_SENSORS];
-
-
 
 void sensingTask(void *param) 
 {
@@ -24,13 +21,13 @@ void sensingTask(void *param)
   {
     String name = String(i);
     sensors[i] = ProximitySensor(name, Sensing::SENSOR_TYPE, Sensing::SENSORPINS[i]);
-    sensorStates[i] = false;
   }
 
   while (true) {
 
     /* BEGIN SENSOR CYCLE  */
     //trigger the first sensor
+    Serial.println("Begin Trigger Cycle");
     digitalWrite(Sensing::TRIGGET_PIN, HIGH);
     delayMicroseconds(Sensing::TRIGGER_DURATION_MICROSECONDS);
     digitalWrite(Sensing::TRIGGET_PIN, LOW);
@@ -39,34 +36,32 @@ void sensingTask(void *param)
 
     for (std::size_t i = 0; i < Sensing::NUMBER_OF_SENSORS; i++)
     {
-      sensors[i].sense();
-      currentSensorStates[i] = sensors[i].getSensorState();
+      Sensing::SensorResponse response = sensors[i].sense();
+      currentSensorStates[i] = response.isTriggered;
       
       //allow the sensor to finish the sensing cycle
-      delay(Sensing::SENSE_DELAY_IN_MILLISECONDS);
+      //Likely don't have to do this
+      //delay(Sensing::SENSE_DELAY_IN_MILLISECONDS);
     }
+    Serial.println("Trigger Cycle Ended");
     /* END OF SENSOR CYCLE */
-
+    
+    String message = "";
     // Send message
     for (std::size_t i=0; i< Sensing::NUMBER_OF_SENSORS; i++)
-    {
-      if (currentSensorStates[i] != sensorStates[i]) {
-        // Send message
-        String message = sensors[i].getSensorName() + ":" + (sensors[i].getSensorState() ? Network::ON : Network::OFF);
-        Serial.println("Sending message : " + message);
-
-        // Send socket message
-        bool success = client.sendMessage(message, Network::RASPBERRY_PI_SERVER_IP, Network::PORT, Network::MAX_TRIES);
-
-        if (success) {
-          sensorStates[i] = sensors[i].getSensorState();
-        }
-        else {
-          Serial.println("Failed to send message");
-        }
-      }
+    { 
+      String sensorState = currentSensorStates[i] ? Network::ON : Network::OFF;
+      message = message + sensorState + ":";
     }
-    delay(Sensing::SENSE_DELAY_IN_MILLISECONDS);
+
+    message.remove(message.length() - 1);
+
+    //send message
+    Serial.println("Sending Message : " + message);
+    bool success = client.sendMessage(message, Network::RASPBERRY_PI_SERVER_IP, Network::PORT, Network::MAX_TRIES);
+    if(!success) {
+      Serial.println("Failed to send message");
+    }
   }
 }
 

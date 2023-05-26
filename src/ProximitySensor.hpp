@@ -32,7 +32,7 @@ public:
             The scale factor is 147uS per inch
             The scale factor is 58uS per cm
         */
-        bool currentSensorState = (static_cast<int>(rawSensorValue / 58) <= Sensing::SENSING_THRESHOLD_IN_CM);
+        bool currentSensorState = (static_cast<long>(rawSensorValue / 58) <= Sensing::SENSING_THRESHOLD_IN_CM);
         return Sensing::SensorResponse{rawSensorValue, currentSensorState};
     }
 };

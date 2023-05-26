@@ -13,6 +13,7 @@ TaskHandle_t  networkTaskHandle;
 
 // Array of sensors
 ProximitySensor sensors[Sensing::NUMBER_OF_SENSORS];
+bool            sensorStates[Sensing::NUMBER_OF_SENSORS];
 
 void sensingTask(void *param) 
 {
@@ -21,6 +22,7 @@ void sensingTask(void *param)
   {
     String name = String(i);
     sensors[i] = ProximitySensor(name, Sensing::SENSOR_TYPE, Sensing::SENSORPINS[i]);
+    sensorStates[i] = false;
   }
 
   while (true) {
@@ -33,11 +35,17 @@ void sensingTask(void *param)
     digitalWrite(Sensing::TRIGGET_PIN, LOW);
 
     bool currentSensorStates[Sensing::NUMBER_OF_SENSORS];
+    bool hasChanged = false;
 
     for (std::size_t i = 0; i < Sensing::NUMBER_OF_SENSORS; i++)
     {
       Sensing::SensorResponse response = sensors[i].sense();
       currentSensorStates[i] = response.isTriggered;
+      if (currentSensorStates[i] != sensorStates[i])
+      {
+        hasChanged = true;
+      }
+      sensorStates[i] = currentSensorStates[i];
       
       //allow the sensor to finish the sensing cycle
       //Likely don't have to do this
@@ -45,6 +53,13 @@ void sensingTask(void *param)
     }
     Serial.println("Trigger Cycle Ended");
     /* END OF SENSOR CYCLE */
+    
+    // Send message if there is a change
+    if (!hasChanged)
+    {
+      Serial.println("No Change");
+      continue;
+    }
     
     String message = "";
     // Send message

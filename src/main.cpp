@@ -30,38 +30,55 @@ void sensingTask(void *param)
     /* BEGIN SENSOR CYCLE  */
     //trigger the first sensor
     Serial.println("Begin Trigger Cycle");
-    digitalWrite(Sensing::TRIGGET_PIN, HIGH);
-    delayMicroseconds(Sensing::TRIGGER_DURATION_MICROSECONDS);
-    digitalWrite(Sensing::TRIGGET_PIN, LOW);
-
+   
+    long sensorVals[Sensing::NUMBER_OF_SENSORS] = {0};
     bool currentSensorStates[Sensing::NUMBER_OF_SENSORS];
-    bool hasChanged = false;
+    bool hasChanged = false; 
+    int8_t sampleCounter = 0;
 
-    for (std::size_t i = 0; i < Sensing::NUMBER_OF_SENSORS; i++)
+    //collect samples
+    while (sampleCounter < Sensing::NUMBER_OF_SAMPLES) {
+
+      //trigger first sensor
+      //rest are triggered via the tx to rx connections 
+      digitalWrite(Sensing::TRIGGET_PIN, HIGH);
+      delayMicroseconds(Sensing::TRIGGER_DURATION_MICROSECONDS);
+      digitalWrite(Sensing::TRIGGET_PIN, LOW);
+      
+      //collect samples
+      for (int i = 0; i < Sensing::NUMBER_OF_SENSORS; i++)
+      {
+        sensorVals[i] += sensors[i].sense();
+      }
+      sampleCounter++;
+    }
+    
+    //average samples
+    //assign states
+    //determine if there is a change
+    for (int i = 0; i < Sensing::NUMBER_OF_SENSORS; i++)
     {
-      Sensing::SensorResponse response = sensors[i].sense();
-      currentSensorStates[i] = response.isTriggered;
+      sensorVals[i] = sensorVals[i] / 5;  //simple average
+
+      //assign state
+      currentSensorStates[i] = (sensorVals[i] <= Sensing::SENSING_THRESHOLD_IN_CM);
+      
+      //has there been a change
       if (currentSensorStates[i] != sensorStates[i])
       {
         hasChanged = true;
+        sensorStates[i] = currentSensorStates[i];
       }
-      sensorStates[i] = currentSensorStates[i];
-      
-      //allow the sensor to finish the sensing cycle
-      //Likely don't have to do this
-      //delay(Sensing::SENSE_DELAY_IN_MILLISECONDS);
     }
-    Serial.println("Trigger Cycle Ended");
-    /* END OF SENSOR CYCLE */
-    
-    // Send message if there is a change
-    if (!hasChanged)
-    {
+
+    //if there is no change don't send a message
+    if(!hasChanged){
       Serial.println("No Change");
       continue;
     }
 
     /* ------------------SEND MESSAGE------------- */
+    
     String message = "";
     // Create Message
     for (std::size_t i=0; i< Sensing::NUMBER_OF_SENSORS; i++)

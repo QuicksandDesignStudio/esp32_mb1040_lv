@@ -26,14 +26,14 @@ public:
     }
 
 
-    Sensing::SensorResponse sense() {
+    long sense() {
         long rawSensorValue = pulseIn(m_sensorPin, HIGH);
         /*
             The scale factor is 147uS per inch
             The scale factor is 58uS per cm
         */
         bool currentSensorState = (static_cast<long>(rawSensorValue / 58) <= Sensing::SENSING_THRESHOLD_IN_CM);
-        return Sensing::SensorResponse{rawSensorValue, currentSensorState};
+        return static_cast<long>(rawSensorValue / 58);
     }
 };
 

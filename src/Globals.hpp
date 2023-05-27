@@ -18,18 +18,11 @@ namespace Sensing
 {
     constexpr const int8_t  TRIGGET_PIN{5};
     constexpr const int8_t  TRIGGER_DURATION_MICROSECONDS{30};
-    constexpr const int8_t  SENSING_CYCLE_IN_MILLISECONDS{50};
-    constexpr const long    SENSING_THRESHOLD_IN_CM{20};
-    constexpr const double  SENSING_TIME_IN_SECONDS{1};
-    constexpr const int8_t  NUMBER_OF_SENSORS{6};
-    constexpr const int8_t  SENSORPINS[NUMBER_OF_SENSORS]{12,13,14,25,26,27};
-    constexpr const int16_t SENSE_DELAY_IN_MILLISECONDS{500};
+    constexpr const long    SENSING_THRESHOLD_IN_CM{30};
+    constexpr const int8_t  NUMBER_OF_SENSORS{3};
+    constexpr const int8_t  SENSORPINS[NUMBER_OF_SENSORS]{26,34, 32};
     String                  SENSOR_TYPE{"mb1040_lv"};
-    struct SensorResponse
-    {
-        long sensorValue;
-        bool isTriggered;
-    };
+    constexpr const int8_t  NUMBER_OF_SAMPLES{5};
 }
 
 // Black box function from Mr. Dave Plumber himself returns time of day

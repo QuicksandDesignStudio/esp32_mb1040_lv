@@ -13,8 +13,8 @@ class WebClient {
 
 private:
     // MODIFY THESE TO MATCH NETWORK SETTINGS
-    const char      *c_ssid     = "Eclipse"; // Network Name
-    const char      *c_password = "bombardtheheadquarters";          // Network Password
+    const char      *c_ssid     = "qs_internal_blr_01"; // Network Name
+    const char      *c_password = "laikaalba";          // Network Password
     const char      *hostname   = "SB_1";               // Hostname
     HardwareSerial  *m_serial;
     WiFiClient      m_wifiClient;

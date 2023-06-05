@@ -45,7 +45,6 @@ void sensingTask(void *param)
 
   while (true) {
 
-    
     // Array to store cumulative sensor values
     long sensorVals[Sensing::NUMBER_OF_SENSORS] = {0};
     

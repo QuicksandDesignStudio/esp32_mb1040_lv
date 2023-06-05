@@ -1,8 +1,10 @@
 #ifndef ProximitySensor_hpp
 #define ProximitySensor_hpp
 
+#include <algorithm>
 #include <Arduino.h>
 #include "Globals.hpp"
+
 
 class ProximitySensor {
 
@@ -11,6 +13,7 @@ private:
     String          m_sensorName;
     String          m_sensorType;
     int8_t          m_sensorPin;
+    int8_t          m_sensor_scale_factor{58};
 
 public:
     ProximitySensor() = default;  // Default constructor
@@ -27,13 +30,12 @@ public:
 
 
     long sense() {
-        long rawSensorValue = pulseIn(m_sensorPin, HIGH);
+        long rawSensorValue = pulseIn(m_sensorPin, HIGH, Sensing::SENSOR_TIME_OUT_IN_MICROSECONDS);
         /*
             The scale factor is 147uS per inch
             The scale factor is 58uS per cm
         */
-        bool currentSensorState = (static_cast<long>(rawSensorValue / 58) <= Sensing::SENSING_THRESHOLD_IN_CM);
-        return static_cast<long>(rawSensorValue / 58);
+        return max(Sensing::SENSING_MINIMUM_IN_CM, static_cast<long>(rawSensorValue / m_sensor_scale_factor));
     }
 };
 

@@ -16,13 +16,24 @@ namespace Network
 
 namespace Sensing
 {
-    constexpr const int8_t  TRIGGET_PIN{5};
+    constexpr const int8_t  COLLECTION_BATCHES{3};
+    constexpr const int8_t  TRIGGER_PINS[COLLECTION_BATCHES]{27, 5, 19};
     constexpr const int8_t  TRIGGER_DURATION_MICROSECONDS{30};
     constexpr const long    SENSING_THRESHOLD_IN_CM{30};
-    constexpr const int8_t  NUMBER_OF_SENSORS{3};
-    constexpr const int8_t  SENSORPINS[NUMBER_OF_SENSORS]{26,34, 32};
+    constexpr const long    SENSING_MINIMUM_IN_CM{20};
+    constexpr const int8_t  NUMBER_OF_SENSORS{6};
+    constexpr const int8_t  SENSORPINS[NUMBER_OF_SENSORS]{26, 25, 33, 32, 35, 34};
+    constexpr const long    SENSOR_TIME_OUT_IN_MICROSECONDS{200000};
+    
     String                  SENSOR_TYPE{"mb1040_lv"};
     constexpr const int8_t  NUMBER_OF_SAMPLES{5};
+
+    void activateSensingSequence(int8_t index)
+    {
+        digitalWrite(TRIGGER_PINS[index], HIGH);
+        delayMicroseconds(TRIGGER_DURATION_MICROSECONDS);
+        digitalWrite(TRIGGER_PINS[index], LOW);
+    }
 }
 
 // Black box function from Mr. Dave Plumber himself returns time of day

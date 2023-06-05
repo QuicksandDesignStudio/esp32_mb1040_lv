@@ -5,8 +5,7 @@
 #include "WebClient.hpp"
 #include "ProximitySensor.hpp"
 
-
-
+bool          printMode{false};
 bool          networkTrackerActive{true};
 WebClient     client{};
 TaskHandle_t  networkTaskHandle;
@@ -14,6 +13,17 @@ TaskHandle_t  networkTaskHandle;
 // Array of sensors
 ProximitySensor sensors[Sensing::NUMBER_OF_SENSORS];
 bool            sensorStates[Sensing::NUMBER_OF_SENSORS];
+
+
+void printSenorValues(long averagedValues[], std::size_t size)
+{
+  Serial.println("-----------------");
+  for (std::size_t i=0; i< size; i++)
+  {
+    Serial.println(String(i) + " : " + String(averagedValues[i]));
+  }
+  Serial.println("-----------------");
+}
 
 void sensingTask(void *param) 
 {
@@ -34,36 +44,36 @@ void sensingTask(void *param)
     long sensorVals[Sensing::NUMBER_OF_SENSORS] = {0};
     bool currentSensorStates[Sensing::NUMBER_OF_SENSORS];
     bool hasChanged = false; 
-    int8_t sampleCounter = 0;
 
-    //collect samples
-    while (sampleCounter < Sensing::NUMBER_OF_SAMPLES) {
-
-      //trigger first sensor
-      //rest are triggered via the tx to rx connections 
-      digitalWrite(Sensing::TRIGGET_PIN, HIGH);
-      delayMicroseconds(Sensing::TRIGGER_DURATION_MICROSECONDS);
-      digitalWrite(Sensing::TRIGGET_PIN, LOW);
-      
-      //collect samples
-      for (int i = 0; i < Sensing::NUMBER_OF_SENSORS; i++)
-      {
-        sensorVals[i] += sensors[i].sense();
-      }
-      sampleCounter++;
-    }
     
-    //average samples
-    //assign states
-    //determine if there is a change
+    int8_t batchCounter = 0;
+    while(batchCounter < Sensing::COLLECTION_BATCHES)
+    {
+      int8_t sampleCounter = 0;
+      int8_t collectFrom = (batchCounter * Sensing::NUMBER_OF_SENSORS / Sensing::COLLECTION_BATCHES);
+      int8_t collectUpto = (Sensing::NUMBER_OF_SENSORS / Sensing::COLLECTION_BATCHES)*(batchCounter + 1) - 1;
+      
+      while (sampleCounter < Sensing::NUMBER_OF_SAMPLES)
+      {
+        Sensing::activateSensingSequence(batchCounter);
+        for (int8_t i=collectFrom; i<=collectUpto; i++)
+        {
+          sensorVals[i] += sensors[i].sense();
+          delay(10);
+        }
+        sampleCounter++;
+      }
+
+      batchCounter ++;
+    }
+
     for (int i = 0; i < Sensing::NUMBER_OF_SENSORS; i++)
     {
-      sensorVals[i] = sensorVals[i] / 5;  //simple average
-
+      //take average
+      sensorVals[i] = sensorVals[i] / Sensing::NUMBER_OF_SAMPLES; 
       //assign state
       currentSensorStates[i] = (sensorVals[i] <= Sensing::SENSING_THRESHOLD_IN_CM);
-      
-      //has there been a change
+      //has it changed 
       if (currentSensorStates[i] != sensorStates[i])
       {
         hasChanged = true;
@@ -71,12 +81,18 @@ void sensingTask(void *param)
       }
     }
 
-    //if there is no change don't send a message
-    if(!hasChanged){
+    if(printMode) 
+    {
+      printSenorValues(sensorVals, sizeof(sensorVals)/sizeof(sensorVals[0]));
+      continue;
+    }
+    
+    if (!hasChanged)
+    {
       Serial.println("No Change");
       continue;
     }
-
+         
     /* ------------------SEND MESSAGE------------- */
     
     String message = "";
@@ -96,6 +112,7 @@ void sensingTask(void *param)
     if(!success) {
       Serial.println("Failed to send message");
     }
+
     /* ------------------------------------------- */
   }
 }
@@ -126,7 +143,12 @@ void networkTask(void *param)
 
 void setup() 
 {
-  pinMode(Sensing::TRIGGET_PIN, OUTPUT);
+  for (int8_t i=0; i< Sensing::COLLECTION_BATCHES; i++)
+  {
+    pinMode(Sensing::TRIGGER_PINS[i], OUTPUT);
+  }
+  
+  
   Serial.begin(115200);
   client.startClient(&Serial);
   

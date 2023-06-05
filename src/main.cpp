@@ -1,3 +1,10 @@
+/*
+Author          : Romit Raj
+Last Modified   : 05/06/2023 (5th June)
+Description     : The main sequencer
+Repo            : https://github.com/QuicksandDesignStudio/esp32_mb1040_lv
+*/
+
 #include <Arduino.h>
 #include <FreeRTOSConfig.h>
 

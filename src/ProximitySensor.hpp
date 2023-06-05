@@ -1,3 +1,10 @@
+/*
+Author          : Romit Raj
+Last Modified   : 05/06/2023 (5th June)
+Description     : ProximitySensor class
+Repo            : https://github.com/QuicksandDesignStudio/esp32_mb1040_lv
+*/
+
 #ifndef ProximitySensor_hpp
 #define ProximitySensor_hpp
 

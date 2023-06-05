@@ -1,4 +1,4 @@
-# LBE Sensing with ESP32 and MaxBotix MB 1040 LV
+# Sensing with ESP32 and MaxBotix MB 1040 LV
 
 ## Platform IO
 This is a pltform IO project. The platformio.ini is available for those that want to recreate this. https://platformio.org/

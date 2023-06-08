@@ -43,6 +43,7 @@ public:
             The scale factor is 58uS per cm
         */
         return max(Sensing::SENSING_MINIMUM_IN_CM, static_cast<long>(rawSensorValue / m_sensor_scale_factor));
+        //return static_cast<long>(rawSensorValue / m_sensor_scale_factor);
     }
 };
 

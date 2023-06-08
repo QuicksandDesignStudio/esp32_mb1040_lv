@@ -87,7 +87,7 @@ void sensingTask(void *param)
         {
           // Add the sensor value to get the cumulative value
           sensorVals[i] += sensors[i].sense();
-          delay(10);
+          //delay(10);
         }
 
         // Increment the sample counter
